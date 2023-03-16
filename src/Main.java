@@ -21,7 +21,7 @@ public class Main {
 		n = 3;
 		m = 2;
 		lambda = 6;
-		tobs = 4;
+		tobs = 5;
 		tsmena = 12;
 
 		mu = getMu(tsmena, tobs);
@@ -36,16 +36,23 @@ public class Main {
 			System.out.println("Вероятность простоя фасовщиков при отсутствии машин p0 = " + p0);
 			System.out.println("Вероятность отказа в обслуживании potkaz = " + potkaz);
 			System.out.println("Вероятность обслуживания pobs = " + pobs);
-			if (pobs >= 0.97)
+			if (pobs >= 0.96)
 				break;
 			m++;
 			System.out.println("\n\n\n");
 		}
 		A = getA(pobs, lambda);
 		nzan = getNzan(A, mu);
-		Loh = getLoh();
-		System.out.println("Абсолютная пропускная способность A = " + A + " авт/дн");
-		System.out.println("Среднее число занятых обслуживанием каналов nzan = " + nzan);
+		Loh = getLoh(n, ro, p0, m);
+		toh = getToh(Loh, lambda);
+		z = getZ(Loh, nzan);
+		tsmo = getTsmo(z, lambda);
+		System.out.println("\nАбсолютная пропускная способность A = " + A + " авт/дн");
+		System.out.println("\nСреднее число занятых обслуживанием каналов nzan = " + nzan);
+		System.out.println("\nСреднее число заявок в очереди Loh = " + Loh);
+		System.out.println("\nСреднее время ожидания обслуживания toh = " + toh);
+		System.out.println("\nСреднее число машин в магазине z = " + z + " авт");
+		System.out.println("\nСреднее время пребывания машины в магазине tsmo = " + tsmo + " дн");
 	}
 
 	private static double getMu(int tsmena, int tobs) {
@@ -89,7 +96,24 @@ public class Main {
 		return A / mu;
 	}
 
-	private static double getLoh() {
+	private static double getLoh(int n, double ro, double p0, int m) {
+		double mult;
+		double mult2;
 
+		mult = Math.pow(n, n) * Math.pow(ro, n + 1) / fact(n);
+		mult2 = (1 - Math.pow(ro, m) * (m + 1 - m * ro)) * p0 / Math.pow(1 - ro, 2);
+		return mult * mult2;
+	}
+
+	private static double getToh(double Loh, double lambda) {
+		return Loh / lambda;
+	}
+
+	private static double getZ(double Loh, double nzan) {
+		return Loh + nzan;
+	}
+
+	private static double getTsmo(double z, double lambda) {
+		return z / lambda;
 	}
 }
